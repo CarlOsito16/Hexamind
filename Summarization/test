@@ -1,0 +1,1290 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyO+RVeFlSseDrNO/VNM2uR+",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    },
+    "accelerator": "GPU",
+    "gpuClass": "standard"
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/CarlOsito16/Hexamind/blob/main/Summarization/test\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip uninstall transformers"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "SdiQDOaWtUzn",
+        "outputId": "4f654ee7-d8d7-44da-d538-07f4cb9c22a0"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[33mWARNING: Ignoring invalid distribution -orch (/usr/local/lib/python3.8/dist-packages)\u001b[0m\u001b[33m\n",
+            "\u001b[0m\u001b[33mWARNING: Ignoring invalid distribution -orch (/usr/local/lib/python3.8/dist-packages)\u001b[0m\u001b[33m\n",
+            "\u001b[0mFound existing installation: transformers 4.26.0\n",
+            "Uninstalling transformers-4.26.0:\n",
+            "  Would remove:\n",
+            "    /usr/local/bin/transformers-cli\n",
+            "    /usr/local/lib/python3.8/dist-packages/transformers-4.26.0.dist-info/*\n",
+            "    /usr/local/lib/python3.8/dist-packages/transformers/*\n",
+            "Proceed (Y/n)? Y\n",
+            "  Successfully uninstalled transformers-4.26.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [],
+      "metadata": {
+        "id": "JK41egoFTeim"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Install the dependent packages"
+      ],
+      "metadata": {
+        "id": "vdz6ZKeoTgh7"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install transformers[sentencepiece]\n",
+        "!pip install gradio\n",
+        "!pip install sentence_transformers\n",
+        "!python -m spacy download fr_core_news_md"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "SUiaU_1S4qs5",
+        "outputId": "4c26ed9d-a961-452b-e3b7-959c834a5c3d"
+      },
+      "execution_count": 27,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Requirement already satisfied: transformers[sentencepiece] in /usr/local/lib/python3.8/dist-packages (4.26.0)\n",
+            "Requirement already satisfied: tqdm>=4.27 in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (4.64.1)\n",
+            "Requirement already satisfied: pyyaml>=5.1 in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (6.0)\n",
+            "Requirement already satisfied: tokenizers!=0.11.3,<0.14,>=0.11.1 in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (0.13.2)\n",
+            "Requirement already satisfied: numpy>=1.17 in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (1.21.6)\n",
+            "Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (23.0)\n",
+            "Requirement already satisfied: filelock in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (3.9.0)\n",
+            "Requirement already satisfied: huggingface-hub<1.0,>=0.11.0 in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (0.12.0)\n",
+            "Requirement already satisfied: requests in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (2.25.1)\n",
+            "Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (2022.6.2)\n",
+            "Requirement already satisfied: sentencepiece!=0.1.92,>=0.1.91 in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (0.1.97)\n",
+            "Requirement already satisfied: protobuf<=3.20.2 in /usr/local/lib/python3.8/dist-packages (from transformers[sentencepiece]) (3.19.6)\n",
+            "Requirement already satisfied: typing-extensions>=3.7.4.3 in /usr/local/lib/python3.8/dist-packages (from huggingface-hub<1.0,>=0.11.0->transformers[sentencepiece]) (4.4.0)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.8/dist-packages (from requests->transformers[sentencepiece]) (2022.12.7)\n",
+            "Requirement already satisfied: chardet<5,>=3.0.2 in /usr/local/lib/python3.8/dist-packages (from requests->transformers[sentencepiece]) (4.0.0)\n",
+            "Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.8/dist-packages (from requests->transformers[sentencepiece]) (1.24.3)\n",
+            "Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.8/dist-packages (from requests->transformers[sentencepiece]) (2.10)\n",
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Requirement already satisfied: gradio in /usr/local/lib/python3.8/dist-packages (3.17.1)\n",
+            "Requirement already satisfied: pycryptodome in /usr/local/lib/python3.8/dist-packages (from gradio) (3.17)\n",
+            "Requirement already satisfied: aiofiles in /usr/local/lib/python3.8/dist-packages (from gradio) (22.1.0)\n",
+            "Requirement already satisfied: aiohttp in /usr/local/lib/python3.8/dist-packages (from gradio) (3.8.3)\n",
+            "Requirement already satisfied: markdown-it-py[linkify,plugins]>=2.0.0 in /usr/local/lib/python3.8/dist-packages (from gradio) (2.1.0)\n",
+            "Requirement already satisfied: ffmpy in /usr/local/lib/python3.8/dist-packages (from gradio) (0.3.0)\n",
+            "Requirement already satisfied: typing-extensions in /usr/local/lib/python3.8/dist-packages (from gradio) (4.4.0)\n",
+            "Requirement already satisfied: fastapi in /usr/local/lib/python3.8/dist-packages (from gradio) (0.89.1)\n",
+            "Requirement already satisfied: numpy in /usr/local/lib/python3.8/dist-packages (from gradio) (1.21.6)\n",
+            "Requirement already satisfied: pandas in /usr/local/lib/python3.8/dist-packages (from gradio) (1.3.5)\n",
+            "Requirement already satisfied: requests in /usr/local/lib/python3.8/dist-packages (from gradio) (2.25.1)\n",
+            "Requirement already satisfied: pillow in /usr/local/lib/python3.8/dist-packages (from gradio) (7.1.2)\n",
+            "Requirement already satisfied: httpx in /usr/local/lib/python3.8/dist-packages (from gradio) (0.23.3)\n",
+            "Requirement already satisfied: uvicorn in /usr/local/lib/python3.8/dist-packages (from gradio) (0.20.0)\n",
+            "Requirement already satisfied: python-multipart in /usr/local/lib/python3.8/dist-packages (from gradio) (0.0.5)\n",
+            "Requirement already satisfied: orjson in /usr/local/lib/python3.8/dist-packages (from gradio) (3.8.5)\n",
+            "Requirement already satisfied: matplotlib in /usr/local/lib/python3.8/dist-packages (from gradio) (3.2.2)\n",
+            "Requirement already satisfied: altair>=4.2.0 in /usr/local/lib/python3.8/dist-packages (from gradio) (4.2.2)\n",
+            "Requirement already satisfied: jinja2 in /usr/local/lib/python3.8/dist-packages (from gradio) (2.11.3)\n",
+            "Requirement already satisfied: pyyaml in /usr/local/lib/python3.8/dist-packages (from gradio) (6.0)\n",
+            "Requirement already satisfied: fsspec in /usr/local/lib/python3.8/dist-packages (from gradio) (2023.1.0)\n",
+            "Requirement already satisfied: pydantic in /usr/local/lib/python3.8/dist-packages (from gradio) (1.10.4)\n",
+            "Requirement already satisfied: markupsafe in /usr/local/lib/python3.8/dist-packages (from gradio) (2.0.1)\n",
+            "Requirement already satisfied: websockets>=10.0 in /usr/local/lib/python3.8/dist-packages (from gradio) (10.4)\n",
+            "Requirement already satisfied: pydub in /usr/local/lib/python3.8/dist-packages (from gradio) (0.25.1)\n",
+            "Requirement already satisfied: toolz in /usr/local/lib/python3.8/dist-packages (from altair>=4.2.0->gradio) (0.12.0)\n",
+            "Requirement already satisfied: entrypoints in /usr/local/lib/python3.8/dist-packages (from altair>=4.2.0->gradio) (0.4)\n",
+            "Requirement already satisfied: jsonschema>=3.0 in /usr/local/lib/python3.8/dist-packages (from altair>=4.2.0->gradio) (4.3.3)\n",
+            "Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.8/dist-packages (from markdown-it-py[linkify,plugins]>=2.0.0->gradio) (0.1.2)\n",
+            "Requirement already satisfied: linkify-it-py~=1.0 in /usr/local/lib/python3.8/dist-packages (from markdown-it-py[linkify,plugins]>=2.0.0->gradio) (1.0.3)\n",
+            "Requirement already satisfied: mdit-py-plugins in /usr/local/lib/python3.8/dist-packages (from markdown-it-py[linkify,plugins]>=2.0.0->gradio) (0.3.3)\n",
+            "Requirement already satisfied: pytz>=2017.3 in /usr/local/lib/python3.8/dist-packages (from pandas->gradio) (2022.7.1)\n",
+            "Requirement already satisfied: python-dateutil>=2.7.3 in /usr/local/lib/python3.8/dist-packages (from pandas->gradio) (2.8.2)\n",
+            "Requirement already satisfied: yarl<2.0,>=1.0 in /usr/local/lib/python3.8/dist-packages (from aiohttp->gradio) (1.8.2)\n",
+            "Requirement already satisfied: charset-normalizer<3.0,>=2.0 in /usr/local/lib/python3.8/dist-packages (from aiohttp->gradio) (2.1.1)\n",
+            "Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.8/dist-packages (from aiohttp->gradio) (22.2.0)\n",
+            "Requirement already satisfied: aiosignal>=1.1.2 in /usr/local/lib/python3.8/dist-packages (from aiohttp->gradio) (1.3.1)\n",
+            "Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.8/dist-packages (from aiohttp->gradio) (1.3.3)\n",
+            "Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.8/dist-packages (from aiohttp->gradio) (6.0.4)\n",
+            "Requirement already satisfied: async-timeout<5.0,>=4.0.0a3 in /usr/local/lib/python3.8/dist-packages (from aiohttp->gradio) (4.0.2)\n",
+            "Requirement already satisfied: starlette==0.22.0 in /usr/local/lib/python3.8/dist-packages (from fastapi->gradio) (0.22.0)\n",
+            "Requirement already satisfied: anyio<5,>=3.4.0 in /usr/local/lib/python3.8/dist-packages (from starlette==0.22.0->fastapi->gradio) (3.6.2)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.8/dist-packages (from httpx->gradio) (2022.12.7)\n",
+            "Requirement already satisfied: rfc3986[idna2008]<2,>=1.3 in /usr/local/lib/python3.8/dist-packages (from httpx->gradio) (1.5.0)\n",
+            "Requirement already satisfied: httpcore<0.17.0,>=0.15.0 in /usr/local/lib/python3.8/dist-packages (from httpx->gradio) (0.16.3)\n",
+            "Requirement already satisfied: sniffio in /usr/local/lib/python3.8/dist-packages (from httpx->gradio) (1.3.0)\n",
+            "Requirement already satisfied: kiwisolver>=1.0.1 in /usr/local/lib/python3.8/dist-packages (from matplotlib->gradio) (1.4.4)\n",
+            "Requirement already satisfied: pyparsing!=2.0.4,!=2.1.2,!=2.1.6,>=2.0.1 in /usr/local/lib/python3.8/dist-packages (from matplotlib->gradio) (3.0.9)\n",
+            "Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.8/dist-packages (from matplotlib->gradio) (0.11.0)\n",
+            "Requirement already satisfied: six>=1.4.0 in /usr/local/lib/python3.8/dist-packages (from python-multipart->gradio) (1.15.0)\n",
+            "Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.8/dist-packages (from requests->gradio) (2.10)\n",
+            "Requirement already satisfied: chardet<5,>=3.0.2 in /usr/local/lib/python3.8/dist-packages (from requests->gradio) (4.0.0)\n",
+            "Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.8/dist-packages (from requests->gradio) (1.24.3)\n",
+            "Requirement already satisfied: click>=7.0 in /usr/local/lib/python3.8/dist-packages (from uvicorn->gradio) (7.1.2)\n",
+            "Requirement already satisfied: h11>=0.8 in /usr/local/lib/python3.8/dist-packages (from uvicorn->gradio) (0.14.0)\n",
+            "Requirement already satisfied: pyrsistent!=0.17.0,!=0.17.1,!=0.17.2,>=0.14.0 in /usr/local/lib/python3.8/dist-packages (from jsonschema>=3.0->altair>=4.2.0->gradio) (0.19.3)\n",
+            "Requirement already satisfied: importlib-resources>=1.4.0 in /usr/local/lib/python3.8/dist-packages (from jsonschema>=3.0->altair>=4.2.0->gradio) (5.10.2)\n",
+            "Requirement already satisfied: uc-micro-py in /usr/local/lib/python3.8/dist-packages (from linkify-it-py~=1.0->markdown-it-py[linkify,plugins]>=2.0.0->gradio) (1.0.1)\n",
+            "Requirement already satisfied: zipp>=3.1.0 in /usr/local/lib/python3.8/dist-packages (from importlib-resources>=1.4.0->jsonschema>=3.0->altair>=4.2.0->gradio) (3.12.0)\n",
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Requirement already satisfied: sentence_transformers in /usr/local/lib/python3.8/dist-packages (2.2.2)\n",
+            "Requirement already satisfied: torch>=1.6.0 in /usr/local/lib/python3.8/dist-packages (from sentence_transformers) (1.13.1+cu116)\n",
+            "Requirement already satisfied: numpy in /usr/local/lib/python3.8/dist-packages (from sentence_transformers) (1.21.6)\n",
+            "Requirement already satisfied: huggingface-hub>=0.4.0 in /usr/local/lib/python3.8/dist-packages (from sentence_transformers) (0.12.0)\n",
+            "Requirement already satisfied: tqdm in /usr/local/lib/python3.8/dist-packages (from sentence_transformers) (4.64.1)\n",
+            "Requirement already satisfied: scipy in /usr/local/lib/python3.8/dist-packages (from sentence_transformers) (1.7.3)\n",
+            "Requirement already satisfied: transformers<5.0.0,>=4.6.0 in /usr/local/lib/python3.8/dist-packages (from sentence_transformers) (4.26.0)\n",
+            "Requirement already satisfied: scikit-learn in /usr/local/lib/python3.8/dist-packages (from sentence_transformers) (1.0.2)\n",
+            "Requirement already satisfied: torchvision in /usr/local/lib/python3.8/dist-packages (from sentence_transformers) (0.14.1+cu116)\n",
+            "Requirement already satisfied: sentencepiece in /usr/local/lib/python3.8/dist-packages (from sentence_transformers) (0.1.97)\n",
+            "Requirement already satisfied: nltk in /usr/local/lib/python3.8/dist-packages (from sentence_transformers) (3.7)\n",
+            "Requirement already satisfied: packaging>=20.9 in /usr/local/lib/python3.8/dist-packages (from huggingface-hub>=0.4.0->sentence_transformers) (23.0)\n",
+            "Requirement already satisfied: pyyaml>=5.1 in /usr/local/lib/python3.8/dist-packages (from huggingface-hub>=0.4.0->sentence_transformers) (6.0)\n",
+            "Requirement already satisfied: typing-extensions>=3.7.4.3 in /usr/local/lib/python3.8/dist-packages (from huggingface-hub>=0.4.0->sentence_transformers) (4.4.0)\n",
+            "Requirement already satisfied: filelock in /usr/local/lib/python3.8/dist-packages (from huggingface-hub>=0.4.0->sentence_transformers) (3.9.0)\n",
+            "Requirement already satisfied: requests in /usr/local/lib/python3.8/dist-packages (from huggingface-hub>=0.4.0->sentence_transformers) (2.25.1)\n",
+            "Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.8/dist-packages (from transformers<5.0.0,>=4.6.0->sentence_transformers) (2022.6.2)\n",
+            "Requirement already satisfied: tokenizers!=0.11.3,<0.14,>=0.11.1 in /usr/local/lib/python3.8/dist-packages (from transformers<5.0.0,>=4.6.0->sentence_transformers) (0.13.2)\n",
+            "Requirement already satisfied: click in /usr/local/lib/python3.8/dist-packages (from nltk->sentence_transformers) (7.1.2)\n",
+            "Requirement already satisfied: joblib in /usr/local/lib/python3.8/dist-packages (from nltk->sentence_transformers) (1.2.0)\n",
+            "Requirement already satisfied: threadpoolctl>=2.0.0 in /usr/local/lib/python3.8/dist-packages (from scikit-learn->sentence_transformers) (3.1.0)\n",
+            "Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in /usr/local/lib/python3.8/dist-packages (from torchvision->sentence_transformers) (7.1.2)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.8/dist-packages (from requests->huggingface-hub>=0.4.0->sentence_transformers) (2022.12.7)\n",
+            "Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.8/dist-packages (from requests->huggingface-hub>=0.4.0->sentence_transformers) (2.10)\n",
+            "Requirement already satisfied: chardet<5,>=3.0.2 in /usr/local/lib/python3.8/dist-packages (from requests->huggingface-hub>=0.4.0->sentence_transformers) (4.0.0)\n",
+            "Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.8/dist-packages (from requests->huggingface-hub>=0.4.0->sentence_transformers) (1.24.3)\n",
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Collecting fr-core-news-md==3.4.0\n",
+            "  Downloading https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.4.0/fr_core_news_md-3.4.0-py3-none-any.whl (45.8 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m45.8/45.8 MB\u001b[0m \u001b[31m24.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: spacy<3.5.0,>=3.4.0 in /usr/local/lib/python3.8/dist-packages (from fr-core-news-md==3.4.0) (3.4.4)\n",
+            "Requirement already satisfied: tqdm<5.0.0,>=4.38.0 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (4.64.1)\n",
+            "Requirement already satisfied: preshed<3.1.0,>=3.0.2 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (3.0.8)\n",
+            "Requirement already satisfied: murmurhash<1.1.0,>=0.28.0 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (1.0.9)\n",
+            "Requirement already satisfied: smart-open<7.0.0,>=5.2.1 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (6.3.0)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (57.4.0)\n",
+            "Requirement already satisfied: pydantic!=1.8,!=1.8.1,<1.11.0,>=1.7.4 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (1.10.4)\n",
+            "Requirement already satisfied: cymem<2.1.0,>=2.0.2 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (2.0.7)\n",
+            "Requirement already satisfied: thinc<8.2.0,>=8.1.0 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (8.1.7)\n",
+            "Requirement already satisfied: wasabi<1.1.0,>=0.9.1 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (0.10.1)\n",
+            "Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (23.0)\n",
+            "Requirement already satisfied: typer<0.8.0,>=0.3.0 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (0.7.0)\n",
+            "Requirement already satisfied: requests<3.0.0,>=2.13.0 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (2.25.1)\n",
+            "Requirement already satisfied: pathy>=0.3.5 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (0.10.1)\n",
+            "Requirement already satisfied: numpy>=1.15.0 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (1.21.6)\n",
+            "Requirement already satisfied: jinja2 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (2.11.3)\n",
+            "Requirement already satisfied: spacy-legacy<3.1.0,>=3.0.10 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (3.0.12)\n",
+            "Requirement already satisfied: catalogue<2.1.0,>=2.0.6 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (2.0.8)\n",
+            "Requirement already satisfied: srsly<3.0.0,>=2.4.3 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (2.4.5)\n",
+            "Requirement already satisfied: langcodes<4.0.0,>=3.2.0 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (3.3.0)\n",
+            "Requirement already satisfied: spacy-loggers<2.0.0,>=1.0.0 in /usr/local/lib/python3.8/dist-packages (from spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (1.0.4)\n",
+            "Requirement already satisfied: typing-extensions>=4.2.0 in /usr/local/lib/python3.8/dist-packages (from pydantic!=1.8,!=1.8.1,<1.11.0,>=1.7.4->spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (4.4.0)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.8/dist-packages (from requests<3.0.0,>=2.13.0->spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (2022.12.7)\n",
+            "Requirement already satisfied: urllib3<1.27,>=1.21.1 in /usr/local/lib/python3.8/dist-packages (from requests<3.0.0,>=2.13.0->spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (1.24.3)\n",
+            "Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.8/dist-packages (from requests<3.0.0,>=2.13.0->spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (2.10)\n",
+            "Requirement already satisfied: chardet<5,>=3.0.2 in /usr/local/lib/python3.8/dist-packages (from requests<3.0.0,>=2.13.0->spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (4.0.0)\n",
+            "Requirement already satisfied: blis<0.8.0,>=0.7.8 in /usr/local/lib/python3.8/dist-packages (from thinc<8.2.0,>=8.1.0->spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (0.7.9)\n",
+            "Requirement already satisfied: confection<1.0.0,>=0.0.1 in /usr/local/lib/python3.8/dist-packages (from thinc<8.2.0,>=8.1.0->spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (0.0.4)\n",
+            "Requirement already satisfied: click<9.0.0,>=7.1.1 in /usr/local/lib/python3.8/dist-packages (from typer<0.8.0,>=0.3.0->spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (7.1.2)\n",
+            "Requirement already satisfied: MarkupSafe>=0.23 in /usr/local/lib/python3.8/dist-packages (from jinja2->spacy<3.5.0,>=3.4.0->fr-core-news-md==3.4.0) (2.0.1)\n",
+            "\u001b[38;5;2m✔ Download and installation successful\u001b[0m\n",
+            "You can now load the package via spacy.load('fr_core_news_md')\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Text Summarization"
+      ],
+      "metadata": {
+        "id": "u-4SJy-dfCoH"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Declare model tokenizers: `camembert` and `T5`"
+      ],
+      "metadata": {
+        "id": "PV8MLCFCTmwA"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import torch\n",
+        "from transformers import RobertaTokenizerFast, EncoderDecoderModel, AutoTokenizer, AutoModelForSeq2SeqLM\n",
+        "import re\n",
+        "import gradio as gr\n",
+        "\n",
+        "#set the device agnostics code\n",
+        "device = 'cuda' if torch.cuda.is_available() else 'cpu'\n",
+        "\n",
+        "# whitespace handler to be used in `t5 model`\n",
+        "WHITESPACE_HANDLER = lambda k: re.sub('\\s+', ' ', re.sub('\\n+', ' ', k.strip()))\n",
+        "\n",
+        "article_text = \"\"\"\\\"Un nuage de fumée juste après l’explosion, le 1er juin 2019. Une déflagration dans une importante usine d’explosifs du centre de la Russie a fait au moins 79 blessés samedi 1er juin. L’explosion a eu lieu dans l’usine Kristall à Dzerzhinsk, une ville située à environ 400 kilomètres à l’est de Moscou, dans la région de Nijni-Novgorod. « Il y a eu une explosion technique dans l’un des ateliers, suivie d’un incendie qui s’est propagé sur une centaine de mètres carrés », a expliqué un porte-parole des services d’urgence. Des images circulant sur les réseaux sociaux montraient un énorme nuage de fumée après l’explosion. Cinq bâtiments de l’usine et près de 180 bâtiments résidentiels ont été endommagés par l’explosion, selon les autorités municipales. Une enquête pour de potentielles violations des normes de sécurité a été ouverte. Fragments de shrapnel Les blessés ont été soignés après avoir été atteints par des fragments issus de l’explosion, a précisé une porte-parole des autorités sanitaires citée par Interfax. « Nous parlons de blessures par shrapnel d’une gravité moyenne et modérée », a-t-elle précisé. Selon des représentants de Kristall, cinq personnes travaillaient dans la zone où s’est produite l’explosion. Elles ont pu être évacuées en sécurité. Les pompiers locaux ont rapporté n’avoir aucune information sur des personnes qui se trouveraient encore dans l’usine.\"\"\"\n",
+        "\n",
+        "\n",
+        "cmb_ckpt = 'mrm8488/camembert2camembert_shared-finetuned-french-summarization'\n",
+        "cmb_tokenizer = RobertaTokenizerFast.from_pretrained(cmb_ckpt)\n",
+        "cmb_model = EncoderDecoderModel.from_pretrained(cmb_ckpt).to(device)\n",
+        "\n",
+        "\n",
+        "t5_model_name = \"csebuetnlp/mT5_multilingual_XLSum\"\n",
+        "t5_tokenizer = AutoTokenizer.from_pretrained(t5_model_name)\n",
+        "t5_model = AutoModelForSeq2SeqLM.from_pretrained(t5_model_name)\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "def clear_input():\n",
+        "    return (\"\", \"\")\n",
+        "\n",
+        "    \n",
+        "def camembert_generate_summary(article_text):\n",
+        "   inputs = cmb_tokenizer([article_text], padding=\"max_length\", truncation=True, max_length=512, return_tensors=\"pt\")\n",
+        "   input_ids = inputs.input_ids.to(device)\n",
+        "   attention_mask = inputs.attention_mask.to(device)\n",
+        "   output = cmb_model.generate(input_ids, attention_mask=attention_mask)\n",
+        "   return cmb_tokenizer.decode(output[0], skip_special_tokens=True)\n",
+        "\n",
+        "\n",
+        "def t5_generate_summary(article_text):\n",
+        "    input_ids = t5_tokenizer(\n",
+        "    [WHITESPACE_HANDLER(article_text)],\n",
+        "    return_tensors=\"pt\",\n",
+        "    padding=\"max_length\",\n",
+        "    truncation=True,\n",
+        "    max_length=512)[\"input_ids\"]\n",
+        "    \n",
+        "    output_ids = t5_model.generate(\n",
+        "        input_ids=input_ids,\n",
+        "        max_length=84,\n",
+        "        no_repeat_ngram_size=2,\n",
+        "        num_beams=4\n",
+        "    )[0]\n",
+        "    \n",
+        "    output = t5_tokenizer.decode(\n",
+        "    output_ids,\n",
+        "    skip_special_tokens=True,\n",
+        "    clean_up_tokenization_spaces=False\n",
+        "    )\n",
+        "\n",
+        "    return output\n",
+        "\n",
+        "def summarizer(dropdown_model, article_text):\n",
+        "    \"\"\"\n",
+        "    Ruturs a summarized version from the full article based on the selected pretrained-model\n",
+        "    \"\"\"\n",
+        "\n",
+        "    if dropdown_model == 'camembert':\n",
+        "        summary = camembert_generate_summary(article_text)\n",
+        "\n",
+        "    elif dropdown_model == 'T5':\n",
+        "        summary = t5_generate_summary(article_text)\n",
+        "\n",
+        "    return summary\n",
+        "\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "E7quqTeCWyab",
+        "outputId": "8aa5b4ce-3a80-4534-8773-ba7a6adbf4f0"
+      },
+      "execution_count": 28,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "The following encoder weights were not tied to the decoder ['roberta/pooler']\n",
+            "The following encoder weights were not tied to the decoder ['roberta/pooler']\n",
+            "/usr/local/lib/python3.8/dist-packages/transformers/convert_slow_tokenizer.py:446: UserWarning: The sentencepiece tokenizer that you are converting to a fast tokenizer uses the byte fallback option which is not implemented in the fast tokenizers. In practice this means that the fast version of the tokenizer can produce unknown tokens whereas the sentencepiece version would have converted these unknown tokens into a sequence of byte tokens matching the original piece of text.\n",
+            "  warnings.warn(\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "t5_generate_summary(article_text)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 54
+        },
+        "id": "5AKmHu2BdZOy",
+        "outputId": "10855933-4ecf-48da-f1c7-0a39da5fbe1a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "'Une déflagration dans une importante usine d’explosifs du centre de la Russie a fait au moins 79 blessés samedi 1er juin.'"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 9
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "summarizer('T5', article_text)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 54
+        },
+        "id": "qrUtZ0HkccGw",
+        "outputId": "81dadb45-14af-4d7f-dc55-bd38cce01ca0"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "'Une déflagration dans une importante usine d’explosifs du centre de la Russie a fait au moins 79 blessés samedi 1er juin.'"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 10
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Demo: on text summarization"
+      ],
+      "metadata": {
+        "id": "BVtHpUcwfG0j"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import gradio as gr"
+      ],
+      "metadata": {
+        "id": "3EAne7nCt3NR"
+      },
+      "execution_count": 29,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "with gr.Blocks() as demo:\n",
+        "    gr.Markdown(\"Summarize the article text.\")\n",
+        "    with gr.Tab(\"Each model\"):\n",
+        "        with gr.Row():\n",
+        "            with gr.Column():\n",
+        "                input_models = gr.Dropdown(['camembert', 'T5'])\n",
+        "                input_article = gr.TextArea(label = 'Article to be summarized')\n",
+        "            with gr.Column():\n",
+        "                summarized_output = gr.TextArea(label= 'Generated summa')\n",
+        "        with gr.Row():\n",
+        "\n",
+        "            clear_button = gr.Button(\"Clear\")\n",
+        "            summarize_button = gr.Button(\"Summarize!\")\n",
+        "            \n",
+        "    summarize_button.click(summarizer,\n",
+        "                           inputs = [input_models, input_article] ,\n",
+        "                           outputs = summarized_output)\n",
+        "    \n",
+        "    clear_button.click(clear_input,\n",
+        "                       outputs = [input_models, input_article])\n",
+        "    \n",
+        "    example = \"Un nuage de fumée juste après l’explosion, le 1er juin 2019. Une déflagration dans une importante usine d’explosifs du centre de la Russie a fait au moins 79 blessés samedi 1er juin. L’explosion a eu lieu dans l’usine Kristall à Dzerzhinsk, une ville située à environ 400 kilomètres à l’est de Moscou, dans la région de Nijni-Novgorod. « Il y a eu une explosion technique dans l’un des ateliers, suivie d’un incendie qui s’est propagé sur une centaine de mètres carrés », a expliqué un porte-parole des services d’urgence. Des images circulant sur les réseaux sociaux montraient un énorme nuage de fumée après l’explosion. Cinq bâtiments de l’usine et près de 180 bâtiments résidentiels ont été endommagés par l’explosion, selon les autorités municipales. Une enquête pour de potentielles violations des normes de sécurité a été ouverte. Fragments de shrapnel Les blessés ont été soignés après avoir été atteints par des fragments issus de l’explosion, a précisé une porte-parole des autorités sanitaires citée par Interfax. « Nous parlons de blessures par shrapnel d’une gravité moyenne et modérée », a-t-elle précisé. Selon des représentants de Kristall, cinq personnes travaillaient dans la zone où s’est produite l’explosion. Elles ont pu être évacuées en sécurité. Les pompiers locaux ont rapporté n’avoir aucune information sur des personnes qui se trouveraient encore dans l’usine.\"\n",
+        "    examples = gr.Examples(examples=[ [\"camembert\",example],\n",
+        "                                     [\"T5\",example]],\n",
+        "                                     inputs=[input_models, input_article])\n",
+        "\n",
+        "demo.launch(debug=True, share=True)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 939
+        },
+        "id": "LMfMrq0ovp92",
+        "outputId": "6805f425-ce43-4327-fc26-f25865a53055"
+      },
+      "execution_count": 30,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Colab notebook detected. This cell will run indefinitely so that you can see errors and logs. To turn off, set debug=False in launch().\n",
+            "Running on public URL: https://d65835c1-fedf-4e7a.gradio.live\n",
+            "\n",
+            "This share link expires in 72 hours. For free permanent hosting and GPU upgrades (NEW!), check out Spaces: https://huggingface.co/spaces\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<IPython.core.display.HTML object>"
+            ],
+            "text/html": [
+              "<div><iframe src=\"https://d65835c1-fedf-4e7a.gradio.live\" width=\"100%\" height=\"500\" allow=\"autoplay; camera; microphone; clipboard-read; clipboard-write;\" frameborder=\"0\" allowfullscreen></iframe></div>"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "Traceback (most recent call last):\n",
+            "  File \"/usr/local/lib/python3.8/dist-packages/gradio/routes.py\", line 344, in run_predict\n",
+            "    output = await app.get_blocks().process_api(\n",
+            "  File \"/usr/local/lib/python3.8/dist-packages/gradio/blocks.py\", line 1012, in process_api\n",
+            "    result = await self.call_function(\n",
+            "  File \"/usr/local/lib/python3.8/dist-packages/gradio/blocks.py\", line 830, in call_function\n",
+            "    prediction = await anyio.to_thread.run_sync(\n",
+            "  File \"/usr/local/lib/python3.8/dist-packages/anyio/to_thread.py\", line 31, in run_sync\n",
+            "    return await get_asynclib().run_sync_in_worker_thread(\n",
+            "  File \"/usr/local/lib/python3.8/dist-packages/anyio/_backends/_asyncio.py\", line 937, in run_sync_in_worker_thread\n",
+            "    return await future\n",
+            "  File \"/usr/local/lib/python3.8/dist-packages/anyio/_backends/_asyncio.py\", line 867, in run\n",
+            "    result = context.run(func, *args)\n",
+            "  File \"<ipython-input-28-d2bbee1cb7b4>\", line 73, in summarizer\n",
+            "    return summary\n",
+            "UnboundLocalError: local variable 'summary' referenced before assignment\n",
+            "/usr/local/lib/python3.8/dist-packages/transformers/generation/utils.py:1273: UserWarning: Neither `max_length` nor `max_new_tokens` has been set, `max_length` will default to 64 (`generation_config.max_length`). Controlling `max_length` via the config is deprecated and `max_length` will be removed from the config in v5 of Transformers -- we recommend using `max_new_tokens` to control the maximum length of the generation.\n",
+            "  warnings.warn(\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Keyboard interruption in main thread... closing server.\n",
+            "Killing tunnel 127.0.0.1:7860 <> https://d65835c1-fedf-4e7a.gradio.live\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": []
+          },
+          "metadata": {},
+          "execution_count": 30
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Keyword Extraction"
+      ],
+      "metadata": {
+        "id": "8gWSIi2NJtcy"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Call the CountVectorizer"
+      ],
+      "metadata": {
+        "id": "mnGx5C1fT7Gf"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import numpy as np\n",
+        "from sklearn.feature_extraction.text import CountVectorizer"
+      ],
+      "metadata": {
+        "id": "Yv0EPNdBJvAj"
+      },
+      "execution_count": 34,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "article_text = \"Je peux pas mettre zéro mais sinon j'aurai mis cette note. Depuis décembre j'attends le remboursement d'un ordinateur portable qui n'a jamais été livré. A la place une cafetière. Une semaine pour avoir un bon de retour. Le colis a bien été remis à l'entrepôt et après 10 appels des échanges de mail aujourd'hui on vient de me dire que je ne serai pas remboursée. Je comprends pas la blague. On ne me rembourse pas pour des erreurs d'argent de chez Carrefour. Je ne peux pas travailler de la maison car je n'ai pas d'ordinateur et je peux pas en racheter un car j'ai pas l'argent enfin di il est sur les comptes de carrefour. Je peux porter plainte? Numero de commande 607275144\"\n",
+        "n_gram_range = (1, 1)\n",
+        "\n",
+        "# Extract candidate words/phrases\n",
+        "count = CountVectorizer(ngram_range=n_gram_range).fit([article_text])\n",
+        "candidates = count.get_feature_names_out()"
+      ],
+      "metadata": {
+        "id": "9wZPV37JKHQx"
+      },
+      "execution_count": 35,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(candidates)\n",
+        "print(len(candidates))\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "1DWauPHRKMbB",
+        "outputId": "5fec8324-2162-4755-ac69-61088ca3c0dc"
+      },
+      "execution_count": 36,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "['10' '607275144' 'ai' 'appels' 'après' 'argent' 'attends' 'aujourd'\n",
+            " 'aurai' 'avoir' 'bien' 'blague' 'bon' 'cafetière' 'car' 'carrefour'\n",
+            " 'cette' 'chez' 'colis' 'commande' 'comprends' 'comptes' 'de' 'depuis'\n",
+            " 'des' 'di' 'dire' 'décembre' 'en' 'enfin' 'entrepôt' 'erreurs' 'est' 'et'\n",
+            " 'hui' 'il' 'jamais' 'je' 'la' 'le' 'les' 'livré' 'mail' 'mais' 'maison'\n",
+            " 'me' 'mettre' 'mis' 'ne' 'note' 'numero' 'on' 'ordinateur' 'pas' 'peux'\n",
+            " 'place' 'plainte' 'portable' 'porter' 'pour' 'que' 'qui' 'racheter'\n",
+            " 'rembourse' 'remboursement' 'remboursée' 'remis' 'retour' 'semaine'\n",
+            " 'serai' 'sinon' 'sur' 'travailler' 'un' 'une' 'vient' 'zéro' 'échanges'\n",
+            " 'été']\n",
+            "79\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Request to Github to download `french_stopwords.txt`"
+      ],
+      "metadata": {
+        "id": "VQhLWGpBUAR0"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import requests\n",
+        "from pathlib import Path\n",
+        "\n",
+        "if Path('french_stopword.txt').is_file():\n",
+        "    print('already exists')\n",
+        "else:\n",
+        "    print('not existed yet')\n",
+        "    request = requests.get(\"https://raw.githubusercontent.com/stopwords-iso/stopwords-fr/master/stopwords-fr.txt\")\n",
+        "    with open('french_stopword.txt', \"wb\") as f:\n",
+        "        f.write(request.content)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "tPn7a50BLTqd",
+        "outputId": "1dc9e60a-b170-4370-e2be-fdf20a39579c"
+      },
+      "execution_count": 37,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "already exists\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# opening the file in read mode\n",
+        "my_file = open(\"french_stopword.txt\", \"r\")\n",
+        "  \n",
+        "# reading the file\n",
+        "data = my_file.read()\n",
+        "  \n",
+        "# replacing end of line('/n') with ' ' and\n",
+        "# splitting the text it further when '.' is seen.\n",
+        "french_stopwords_list = data.replace('\\n', ' ').split(\" \")\n",
+        "  \n",
+        "# # printing the data\n",
+        "print(french_stopwords_list)\n",
+        "my_file.close()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "s98BszDKLeRE",
+        "outputId": "7285be14-4c88-4e3b-eb61-682c9f30e6cf"
+      },
+      "execution_count": 38,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "['a', 'abord', 'absolument', 'afin', 'ah', 'ai', 'aie', 'aient', 'aies', 'ailleurs', 'ainsi', 'ait', 'allaient', 'allo', 'allons', 'allô', 'alors', 'anterieur', 'anterieure', 'anterieures', 'apres', 'après', 'as', 'assez', 'attendu', 'au', 'aucun', 'aucune', 'aucuns', 'aujourd', \"aujourd'hui\", 'aupres', 'auquel', 'aura', 'aurai', 'auraient', 'aurais', 'aurait', 'auras', 'aurez', 'auriez', 'aurions', 'aurons', 'auront', 'aussi', 'autant', 'autre', 'autrefois', 'autrement', 'autres', 'autrui', 'aux', 'auxquelles', 'auxquels', 'avaient', 'avais', 'avait', 'avant', 'avec', 'avez', 'aviez', 'avions', 'avoir', 'avons', 'ayant', 'ayez', 'ayons', 'b', 'bah', 'bas', 'basee', 'bat', 'beau', 'beaucoup', 'bien', 'bigre', 'bon', 'boum', 'bravo', 'brrr', 'c', 'car', 'ce', 'ceci', 'cela', 'celle', 'celle-ci', 'celle-là', 'celles', 'celles-ci', 'celles-là', 'celui', 'celui-ci', 'celui-là', 'celà', 'cent', 'cependant', 'certain', 'certaine', 'certaines', 'certains', 'certes', 'ces', 'cet', 'cette', 'ceux', 'ceux-ci', 'ceux-là', 'chacun', 'chacune', 'chaque', 'cher', 'chers', 'chez', 'chiche', 'chut', 'chère', 'chères', 'ci', 'cinq', 'cinquantaine', 'cinquante', 'cinquantième', 'cinquième', 'clac', 'clic', 'combien', 'comme', 'comment', 'comparable', 'comparables', 'compris', 'concernant', 'contre', 'couic', 'crac', 'd', 'da', 'dans', 'de', 'debout', 'dedans', 'dehors', 'deja', 'delà', 'depuis', 'dernier', 'derniere', 'derriere', 'derrière', 'des', 'desormais', 'desquelles', 'desquels', 'dessous', 'dessus', 'deux', 'deuxième', 'deuxièmement', 'devant', 'devers', 'devra', 'devrait', 'different', 'differentes', 'differents', 'différent', 'différente', 'différentes', 'différents', 'dire', 'directe', 'directement', 'dit', 'dite', 'dits', 'divers', 'diverse', 'diverses', 'dix', 'dix-huit', 'dix-neuf', 'dix-sept', 'dixième', 'doit', 'doivent', 'donc', 'dont', 'dos', 'douze', 'douzième', 'dring', 'droite', 'du', 'duquel', 'durant', 'dès', 'début', 'désormais', 'e', 'effet', 'egale', 'egalement', 'egales', 'eh', 'elle', 'elle-même', 'elles', 'elles-mêmes', 'en', 'encore', 'enfin', 'entre', 'envers', 'environ', 'es', 'essai', 'est', 'et', 'etant', 'etc', 'etre', 'eu', 'eue', 'eues', 'euh', 'eurent', 'eus', 'eusse', 'eussent', 'eusses', 'eussiez', 'eussions', 'eut', 'eux', 'eux-mêmes', 'exactement', 'excepté', 'extenso', 'exterieur', 'eûmes', 'eût', 'eûtes', 'f', 'fais', 'faisaient', 'faisant', 'fait', 'faites', 'façon', 'feront', 'fi', 'flac', 'floc', 'fois', 'font', 'force', 'furent', 'fus', 'fusse', 'fussent', 'fusses', 'fussiez', 'fussions', 'fut', 'fûmes', 'fût', 'fûtes', 'g', 'gens', 'h', 'ha', 'haut', 'hein', 'hem', 'hep', 'hi', 'ho', 'holà', 'hop', 'hormis', 'hors', 'hou', 'houp', 'hue', 'hui', 'huit', 'huitième', 'hum', 'hurrah', 'hé', 'hélas', 'i', 'ici', 'il', 'ils', 'importe', 'j', 'je', 'jusqu', 'jusque', 'juste', 'k', 'l', 'la', 'laisser', 'laquelle', 'las', 'le', 'lequel', 'les', 'lesquelles', 'lesquels', 'leur', 'leurs', 'longtemps', 'lors', 'lorsque', 'lui', 'lui-meme', 'lui-même', 'là', 'lès', 'm', 'ma', 'maint', 'maintenant', 'mais', 'malgre', 'malgré', 'maximale', 'me', 'meme', 'memes', 'merci', 'mes', 'mien', 'mienne', 'miennes', 'miens', 'mille', 'mince', 'mine', 'minimale', 'moi', 'moi-meme', 'moi-même', 'moindres', 'moins', 'mon', 'mot', 'moyennant', 'multiple', 'multiples', 'même', 'mêmes', 'n', 'na', 'naturel', 'naturelle', 'naturelles', 'ne', 'neanmoins', 'necessaire', 'necessairement', 'neuf', 'neuvième', 'ni', 'nombreuses', 'nombreux', 'nommés', 'non', 'nos', 'notamment', 'notre', 'nous', 'nous-mêmes', 'nouveau', 'nouveaux', 'nul', 'néanmoins', 'nôtre', 'nôtres', 'o', 'oh', 'ohé', 'ollé', 'olé', 'on', 'ont', 'onze', 'onzième', 'ore', 'ou', 'ouf', 'ouias', 'oust', 'ouste', 'outre', 'ouvert', 'ouverte', 'ouverts', 'o|', 'où', 'p', 'paf', 'pan', 'par', 'parce', 'parfois', 'parle', 'parlent', 'parler', 'parmi', 'parole', 'parseme', 'partant', 'particulier', 'particulière', 'particulièrement', 'pas', 'passé', 'pendant', 'pense', 'permet', 'personne', 'personnes', 'peu', 'peut', 'peuvent', 'peux', 'pff', 'pfft', 'pfut', 'pif', 'pire', 'pièce', 'plein', 'plouf', 'plupart', 'plus', 'plusieurs', 'plutôt', 'possessif', 'possessifs', 'possible', 'possibles', 'pouah', 'pour', 'pourquoi', 'pourrais', 'pourrait', 'pouvait', 'prealable', 'precisement', 'premier', 'première', 'premièrement', 'pres', 'probable', 'probante', 'procedant', 'proche', 'près', 'psitt', 'pu', 'puis', 'puisque', 'pur', 'pure', 'q', 'qu', 'quand', 'quant', 'quant-à-soi', 'quanta', 'quarante', 'quatorze', 'quatre', 'quatre-vingt', 'quatrième', 'quatrièmement', 'que', 'quel', 'quelconque', 'quelle', 'quelles', \"quelqu'un\", 'quelque', 'quelques', 'quels', 'qui', 'quiconque', 'quinze', 'quoi', 'quoique', 'r', 'rare', 'rarement', 'rares', 'relative', 'relativement', 'remarquable', 'rend', 'rendre', 'restant', 'reste', 'restent', 'restrictif', 'retour', 'revoici', 'revoilà', 'rien', 's', 'sa', 'sacrebleu', 'sait', 'sans', 'sapristi', 'sauf', 'se', 'sein', 'seize', 'selon', 'semblable', 'semblaient', 'semble', 'semblent', 'sent', 'sept', 'septième', 'sera', 'serai', 'seraient', 'serais', 'serait', 'seras', 'serez', 'seriez', 'serions', 'serons', 'seront', 'ses', 'seul', 'seule', 'seulement', 'si', 'sien', 'sienne', 'siennes', 'siens', 'sinon', 'six', 'sixième', 'soi', 'soi-même', 'soient', 'sois', 'soit', 'soixante', 'sommes', 'son', 'sont', 'sous', 'souvent', 'soyez', 'soyons', 'specifique', 'specifiques', 'speculatif', 'stop', 'strictement', 'subtiles', 'suffisant', 'suffisante', 'suffit', 'suis', 'suit', 'suivant', 'suivante', 'suivantes', 'suivants', 'suivre', 'sujet', 'superpose', 'sur', 'surtout', 't', 'ta', 'tac', 'tandis', 'tant', 'tardive', 'te', 'tel', 'telle', 'tellement', 'telles', 'tels', 'tenant', 'tend', 'tenir', 'tente', 'tes', 'tic', 'tien', 'tienne', 'tiennes', 'tiens', 'toc', 'toi', 'toi-même', 'ton', 'touchant', 'toujours', 'tous', 'tout', 'toute', 'toutefois', 'toutes', 'treize', 'trente', 'tres', 'trois', 'troisième', 'troisièmement', 'trop', 'très', 'tsoin', 'tsouin', 'tu', 'té', 'u', 'un', 'une', 'unes', 'uniformement', 'unique', 'uniques', 'uns', 'v', 'va', 'vais', 'valeur', 'vas', 'vers', 'via', 'vif', 'vifs', 'vingt', 'vivat', 'vive', 'vives', 'vlan', 'voici', 'voie', 'voient', 'voilà', 'voire', 'vont', 'vos', 'votre', 'vous', 'vous-mêmes', 'vu', 'vé', 'vôtre', 'vôtres', 'w', 'x', 'y', 'z', 'zut', 'à', 'â', 'ça', 'ès', 'étaient', 'étais', 'était', 'étant', 'état', 'étiez', 'étions', 'été', 'étée', 'étées', 'étés', 'êtes', 'être', 'ô']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "article_text = \"Je peux pas mettre zéro mais sinon j'aurai mis cette note. Depuis décembre j'attends le remboursement d'un ordinateur portable qui n'a jamais été livré. A la place une cafetière. Une semaine pour avoir un bon de retour. Le colis a bien été remis à l'entrepôt et après 10 appels des échanges de mail aujourd'hui on vient de me dire que je ne serai pas remboursée. Je comprends pas la blague. On ne me rembourse pas pour des erreurs d'argent de chez Carrefour. Je ne peux pas travailler de la maison car je n'ai pas d'ordinateur et je peux pas en racheter un car j'ai pas l'argent enfin di il est sur les comptes de carrefour. Je peux porter plainte? Numero de commande 607275144\"\n",
+        "n_gram_range = (1, 1)\n",
+        "\n",
+        "# Extract candidate words/phrases\n",
+        "count = CountVectorizer(ngram_range=n_gram_range,\n",
+        "                        stop_words = french_stopwords_list).fit([article_text])\n",
+        "candidates_without_stopwords = count.get_feature_names_out()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "kb79l5hEgToK",
+        "outputId": "15c6c150-a370-46ba-cd3d-6c8a4fc0b033"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "/usr/local/lib/python3.8/dist-packages/sklearn/feature_extraction/text.py:396: UserWarning: Your stop_words may be inconsistent with your preprocessing. Tokenizing the stop words generated tokens ['quelqu'] not in stop_words.\n",
+            "  warnings.warn(\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "len(candidates_without_stopwords)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sdT96K_shMUM",
+        "outputId": "8e54cf7b-7879-4ca9-cc47-d4092d21311a"
+      },
+      "execution_count": 39,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "39"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 39
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## prin the the `candidates_without_stopwords`"
+      ],
+      "metadata": {
+        "id": "504O6tBuUMPG"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "candidates_without_stopwords"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "GCa185ZahfqK",
+        "outputId": "8b7ed81d-d6fb-43ec-ad83-edf6cd902d7d"
+      },
+      "execution_count": 40,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array(['10', '607275144', 'appels', 'argent', 'attends', 'blague',\n",
+              "       'cafetière', 'carrefour', 'colis', 'commande', 'comprends',\n",
+              "       'comptes', 'di', 'décembre', 'entrepôt', 'erreurs', 'jamais',\n",
+              "       'livré', 'mail', 'maison', 'mettre', 'mis', 'note', 'numero',\n",
+              "       'ordinateur', 'place', 'plainte', 'portable', 'porter', 'racheter',\n",
+              "       'rembourse', 'remboursement', 'remboursée', 'remis', 'semaine',\n",
+              "       'travailler', 'vient', 'zéro', 'échanges'], dtype=object)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 40
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# `SpaCy` for name entity recognition"
+      ],
+      "metadata": {
+        "id": "icRMSs7GU746"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import spacy"
+      ],
+      "metadata": {
+        "id": "2cfRDzRzWADH"
+      },
+      "execution_count": 41,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "nlp = spacy.load(\"fr_core_news_md\")"
+      ],
+      "metadata": {
+        "id": "ZdTtIeEJVSrf"
+      },
+      "execution_count": 42,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "for word_idx in range(10, 15):\n",
+        "    doc = nlp(candidates_without_stopwords[word_idx])\n",
+        "    print(doc.text)\n",
+        "    for token in doc:\n",
+        "        print(token.text, token.pos_, token.dep_)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "y7a2GsIKWHUt",
+        "outputId": "b68204ac-c715-4a47-8e2d-d1c4ebcf278f"
+      },
+      "execution_count": 43,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "comprends\n",
+            "comprends NOUN ROOT\n",
+            "comptes\n",
+            "comptes NOUN ROOT\n",
+            "di\n",
+            "di PROPN ROOT\n",
+            "décembre\n",
+            "décembre NOUN ROOT\n",
+            "entrepôt\n",
+            "entrepôt NOUN ROOT\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Functionalize the Noun only"
+      ],
+      "metadata": {
+        "id": "jWXA41hRb6ef"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def slice_only_noun_token(ner, token_list):\n",
+        "    slice_list = []\n",
+        "    for word_idx in range(len(token_list)):\n",
+        "         doc = nlp(candidates_without_stopwords[word_idx])\n",
+        "\n",
+        "         for token in doc:\n",
+        "             if token.pos_ == 'NOUN':\n",
+        "                 slice_list.append(token.text)\n",
+        "\n",
+        "    return slice_list\n"
+      ],
+      "metadata": {
+        "id": "RaBVAEIkZwhE"
+      },
+      "execution_count": 44,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "sliced_candidates_without_stopwords = slice_only_noun_token(nlp, candidates_without_stopwords)\n",
+        "sliced_candidates_without_stopwords"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Ex3yIzYObZUS",
+        "outputId": "efc6787f-c435-4983-89e5-017997998163"
+      },
+      "execution_count": 45,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['appels',\n",
+              " 'argent',\n",
+              " 'blague',\n",
+              " 'cafetière',\n",
+              " 'carrefour',\n",
+              " 'colis',\n",
+              " 'commande',\n",
+              " 'comprends',\n",
+              " 'comptes',\n",
+              " 'décembre',\n",
+              " 'entrepôt',\n",
+              " 'erreurs',\n",
+              " 'mail',\n",
+              " 'maison',\n",
+              " 'note',\n",
+              " 'numero',\n",
+              " 'ordinateur',\n",
+              " 'place',\n",
+              " 'plainte',\n",
+              " 'portable',\n",
+              " 'remboursement',\n",
+              " 'semaine',\n",
+              " 'échanges']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 45
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Top 3 Keyword"
+      ],
+      "metadata": {
+        "id": "Dvb-PQ80chHy"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sentence_transformers import SentenceTransformer\n",
+        "model =  SentenceTransformer(\"dangvantuan/sentence-camembert-large\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "y6luVGsrhqta",
+        "outputId": "e6745f9b-6ef8-4ac7-879e-6fc54b12f980"
+      },
+      "execution_count": 46,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "WARNING:sentence_transformers.SentenceTransformer:No sentence-transformers model found with name /root/.cache/torch/sentence_transformers/dangvantuan_sentence-camembert-large. Creating a new one with MEAN pooling.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.metrics.pairwise import cosine_similarity\n",
+        "\n",
+        "\n",
+        "doc_embedding = model.encode([article_text])\n",
+        "candidate_embeddings = model.encode(sliced_candidates_without_stopwords)\n",
+        "\n",
+        "top_n = 3\n",
+        "distances = cosine_similarity(doc_embedding, candidate_embeddings)\n",
+        "keywords = [sliced_candidates_without_stopwords[index] for index in distances.argsort()[0][-top_n:]]\n"
+      ],
+      "metadata": {
+        "id": "Br_80c-Tj0m6"
+      },
+      "execution_count": 47,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "keywords"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "i7LGsP92pkJD",
+        "outputId": "ac94579b-bfcd-4617-a0f9-39acf31645ce"
+      },
+      "execution_count": 48,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['ordinateur', 'colis', 'remboursement']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 48
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "doc_embedding = model.encode([article_text])\n",
+        "candidate_embeddings = model.encode(candidates_without_stopwords)\n",
+        "\n",
+        "top_n = 10\n",
+        "distances = cosine_similarity(doc_embedding, candidate_embeddings)\n",
+        "keywords = [candidates_without_stopwords[index] for index in distances.argsort()[0][-top_n:]]\n",
+        "keywords"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "dNeGqwRPdPpo",
+        "outputId": "efd48cab-2c47-4853-c126-441166cab798"
+      },
+      "execution_count": 49,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['plainte',\n",
+              " 'jamais',\n",
+              " 'cafetière',\n",
+              " 'ordinateur',\n",
+              " 'colis',\n",
+              " 'livré',\n",
+              " 'attends',\n",
+              " 'remboursée',\n",
+              " 'remboursement',\n",
+              " 'rembourse']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 49
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "doc_embedding = model.encode([article_text])\n",
+        "candidate_embeddings = model.encode(candidates_without_stopwords)"
+      ],
+      "metadata": {
+        "id": "abLUk7vtrRQt"
+      },
+      "execution_count": 50,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Functionalize the `key work extraction`"
+      ],
+      "metadata": {
+        "id": "qQ0KNi_psVr_"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def key_word_extractor(article_text, \n",
+        "                       ner,\n",
+        "                       french_stopwords=None):\n",
+        "    \"\"\"\n",
+        "    Extract only the most re\n",
+        "        Args:\n",
+        "            ner (spacy): The NER class to detect the `token.pos_`\n",
+        "            token_list (list): List of token from the full article\n",
+        "\n",
+        "        Returns:\n",
+        "            slice_list (list): List of token containing only \"NOUN\" part of speech\n",
+        "    \"\"\"\n",
+        "\n",
+        "\n",
+        "\n",
+        "    n_gram_range = (1, 1) #specify the key word length\n",
+        "    count = CountVectorizer(ngram_range=n_gram_range,\n",
+        "                        stop_words = french_stopwords).fit([article_text])  #call the `CountVectorizer`\n",
+        "    candidates_without_stopwords = count.get_feature_names_out()\n",
+        "    sliced_candidates_without_stopwords = slice_only_noun_token(ner, candidates_without_stopwords )\n",
+        "\n",
+        "    return sliced_candidates_without_stopwords\n",
+        "\n",
+        "\n",
+        "def slice_only_noun_token(ner, token_list):\n",
+        "    \"\"\"\n",
+        "    Given the tokenized list, this function returns only the \"NOUN\" token\n",
+        "        Args:\n",
+        "            ner (spacy): The NER class to detect the `token.pos_`\n",
+        "            token_list (list): List of token from the full article\n",
+        "\n",
+        "        Returns:\n",
+        "            slice_list (list): List of token containing only \"NOUN\" part of speech\n",
+        "    \"\"\"\n",
+        "\n",
+        "    slice_list = []\n",
+        "    for word_idx in range(len(token_list)):\n",
+        "         doc = ner(candidates_without_stopwords[word_idx])\n",
+        "\n",
+        "         for token in doc:\n",
+        "             if token.pos_ == 'NOUN':\n",
+        "                 slice_list.append(token.text)\n",
+        "\n",
+        "    return slice_list"
+      ],
+      "metadata": {
+        "id": "TztTaePZsYhr"
+      },
+      "execution_count": 70,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Creat the `keyWordExtractor class`"
+      ],
+      "metadata": {
+        "id": "t2zG0Q6b-EBI"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "class keyWordExtractor():\n",
+        "    \n",
+        "    def __init__(self, \n",
+        "                 article_text,\n",
+        "                 similarity_model,\n",
+        "                 n_gram = 1,\n",
+        "                 top_n = 3,\n",
+        "                 french_stopwords = None,\n",
+        "                 ner= None,\n",
+        "                 ):\n",
+        "        self.article_text = article_text\n",
+        "        self.french_stopwords = french_stopwords\n",
+        "        self.ner = ner\n",
+        "        self.candidates = self.count_vectorizer(n_gram)\n",
+        "        self.noun_candidates, self.proper_noun_candidates = self.slice_only_noun_token(ner, self.candidates)\n",
+        "        self.top_n_keywords = self.top_n_extractor(similarity_model, top_n)\n",
+        "    \n",
+        "    def count_vectorizer(self, n_gram):\n",
+        "        n_gram_range = (n_gram, n_gram)\n",
+        "        # Extract candidate words/phrases\n",
+        "        count = CountVectorizer(ngram_range=n_gram_range,\n",
+        "                        stop_words = self.french_stopwords).fit([article_text])\n",
+        "        candidates = count.get_feature_names_out()\n",
+        "\n",
+        "        return candidates\n",
+        "\n",
+        "    def slice_only_noun_token(self, ner, token_list):\n",
+        "        \"\"\"\n",
+        "        Given the tokenized list, this function returns only the \"NOUN\" token\n",
+        "            Args:\n",
+        "                ner (spacy): The NER class to detect the `token.pos_`\n",
+        "                token_list (list): List of token from the full article\n",
+        "\n",
+        "            Returns:\n",
+        "                slice_list (list): List of token containing only \"NOUN\" part of speech\n",
+        "        \"\"\"\n",
+        "\n",
+        "        noun_slice_list = []\n",
+        "        proper_noun_slice_list = []\n",
+        "        for word_idx in range(len(token_list)):\n",
+        "            doc = ner(token_list[word_idx])\n",
+        "\n",
+        "            for token in doc:\n",
+        "                if token.pos_ == 'NOUN':\n",
+        "                    noun_slice_list.append(token.text)\n",
+        "                elif token.pos_ == 'PROPN':\n",
+        "                    proper_noun_slice_list.append(token.text)\n",
+        "\n",
+        "        return noun_slice_list, proper_noun_slice_list\n",
+        "\n",
+        "    def top_n_extractor(self, model, top_n):\n",
+        "        doc_embedding = model.encode([self.article_text])\n",
+        "        candidate_embeddings = model.encode(self.noun_candidates)\n",
+        "        distances = cosine_similarity(doc_embedding, candidate_embeddings)\n",
+        "        keywords = [self.noun_candidates[index] for index in distances.argsort()[0][-top_n:]]\n",
+        "\n",
+        "        return keywords\n",
+        "\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "P2ww5XQ4s6GX"
+      },
+      "execution_count": 176,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "article_text= \"\"\"\n",
+        "Un nuage de fumée juste après l’explosion, le 1er juin 2019. Une déflagration dans une importante usine d’explosifs du centre de la Russie a fait au moins 79 blessés samedi 1er juin. L’explosion a eu lieu dans l’usine Kristall à Dzerzhinsk, une ville située à environ 400 kilomètres à l’est de Moscou, dans la région de Nijni-Novgorod. « Il y a eu une explosion technique dans l’un des ateliers, suivie d’un incendie qui s’est propagé sur une centaine de mètres carrés », a expliqué un porte-parole des services d’urgence. Des images circulant sur les réseaux sociaux montraient un énorme nuage de fumée après l’explosion. Cinq bâtiments de l’usine et près de 180 bâtiments résidentiels ont été endommagés par l’explosion, selon les autorités municipales. Une enquête pour de potentielles violations des normes de sécurité a été ouverte. Fragments de shrapnel Les blessés ont été soignés après avoir été atteints par des fragments issus de l’explosion, a précisé une porte-parole des autorités sanitaires citée par Interfax. « Nous parlons de blessures par shrapnel d’une gravité moyenne et modérée », a-t-elle précisé. Selon des représentants de Kristall, cinq personnes travaillaient dans la zone où s’est produite l’explosion. Elles ont pu être évacuées en sécurité. Les pompiers locaux ont rapporté n’avoir aucune information sur des personnes qui se trouveraient encore dans l’usine.\n",
+        "\n",
+        "\"\"\"\n",
+        "\n",
+        "a = keyWordExtractor(article_text,\n",
+        "                     n_gram = 1, \n",
+        "                     top_n = 3,\n",
+        "                     ner = nlp, \n",
+        "                     similarity_model = model)\n",
+        "a.proper_noun_candidates"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "KZoETf1lwy-a",
+        "outputId": "56ba1a2e-060e-4ea0-eaf1-2b570044e2ed"
+      },
+      "execution_count": 186,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['moscou', 'novgorod', 'russie']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 186
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "a.top_n_keywords"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "2wDLer635Ze0",
+        "outputId": "72f71436-2540-4e4a-9bf4-1a568e241362"
+      },
+      "execution_count": 187,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['explosifs', 'explosion', 'déflagration']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 187
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "6-bVg10GA5TO"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
