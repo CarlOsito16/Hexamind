@@ -7,3 +7,8 @@ Given the customer reviews from public website such as Trustadvisor, this demo a
 - **Key Word Extraction**: To achieve the key word extraction, below is the pipline
 
 <img width="700" alt="Screen Shot 2566-02-08 at 12 37 18" src="https://user-images.githubusercontent.com/78911624/217519988-d3d8a0f0-e381-494e-bd9a-f1a2e5f73597.png">
+
+
+The defaut `top_n` hyperparameter for `NOUN` token is 3. This should suggest the top most relevant words that could be later used for clustering when having larger dataset of reviews.
+
+As for the `PROPN` or `proper noun` tokens, not every review has this word, thus the model can also return blank. The purpose of this proper noun extraction is to give a more fine-grained insights into plausibly product brands, branch names, city etc.
