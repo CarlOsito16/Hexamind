@@ -89,6 +89,9 @@ class_1_fig = px.pie(data_frame= group_df[group_df['clean_BE'] == 1],
        color_discrete_map = color_map,
        category_orders = {"sentiment": ['positive' ,'negative' 'neutral']},
        hole= 0.5)
+class_1_fig.update_layout(showlegend=False,
+                          width=350,
+                          height=350)
 
 class_2_fig = px.pie(data_frame= group_df[group_df['clean_PD'] == 1],
        names = group_df[group_df['clean_PD'] == 1].sentiment,
@@ -96,6 +99,9 @@ class_2_fig = px.pie(data_frame= group_df[group_df['clean_PD'] == 1],
        color_discrete_map = color_map,
        category_orders = {"sentiment": ['positive' ,'negative' 'neutral']},
        hole= 0.5)
+class_2_fig.update_layout(showlegend=False,
+                          width=350,
+                          height=350)
 
 class_3_fig = px.pie(data_frame= group_df[group_df['clean_DM'] == 1],
        names = group_df[group_df['clean_DM'] == 1].sentiment,
@@ -103,6 +109,9 @@ class_3_fig = px.pie(data_frame= group_df[group_df['clean_DM'] == 1],
        color_discrete_map = color_map,
        category_orders = {"sentiment": ['positive' ,'negative' 'neutral']},
        hole= 0.5)
+class_3_fig.update_layout(showlegend=False,
+                          width=350,
+                          height=350)
 
 class_4_fig = px.pie(data_frame= group_df[group_df['clean_AS'] == 1],
        names = group_df[group_df['clean_AS'] == 1].sentiment,
@@ -110,14 +119,29 @@ class_4_fig = px.pie(data_frame= group_df[group_df['clean_AS'] == 1],
        color_discrete_map = color_map,
        category_orders = {"sentiment": ['positive' ,'negative' 'neutral']},
        hole= 0.5)
+class_4_fig.update_layout(showlegend=True,
+                          width=350,
+                          height=350,
+                          legend=dict(
+                                orientation="h",
+                                yanchor="middle",
+                                y= 1.15,
+                                xanchor="center",
+                                x= 0.5
+                            ))
 
+
+
+
+
+")
 
 
 
 kpi1, kpi2, kpi3 = st.columns(3)
 
 with kpi1:
-    st.markdown("**All reviewsf**")
+    st.subheader("**All reviewsf**")
     st.plotly_chart(pie_fig, use_container_width=True)
 
 
