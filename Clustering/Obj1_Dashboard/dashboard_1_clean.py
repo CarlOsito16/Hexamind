@@ -42,7 +42,10 @@ color_map = {'positive' : "royalblue",
                       'negative': 'tomato'}
 
 
-df = pd.read_csv('20230220_selected_df.csv',
+# df = pd.read_csv('20230220_selected_df.csv',
+#                  index_col=0)
+
+df = pd.read_csv('carlosito16/hexamind/main/Clustering/Obj1_Dashboard/20230220_selected_df.csv',
                  index_col=0)
 
 
