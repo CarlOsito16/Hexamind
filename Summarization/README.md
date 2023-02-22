@@ -18,5 +18,5 @@ As for the `PROPN` or `proper noun` tokens, not every review has this word, thus
 
 ---
 # File Description
-- Hexamind_resume.ipynb: the first and original file developed on colab, it contains all the workflow from end to end
-- GenerateSummary.ipynb: this file is to only call the functions developed prior to generate summary and keywords based on the manually dataset at 20230220 
+- `Hexamind_resume.ipynb`: the first and original file developed on colab, it contains all the workflow from end to end
+- `GenerateSummary.ipynb`: this file is to only call the functions developed prior to generate summary and keywords based on the manually dataset at 20230220 
