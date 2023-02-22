@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
+from PIL import Image
 
 
 
@@ -42,11 +43,13 @@ color_map = {'positive' : "royalblue",
                       'negative': 'tomato'}
 
 
-# df = pd.read_csv('20230220_selected_df.csv',
-#                  index_col=0)
 
-df = pd.read_csv('carlosito16/hexamind/main/Clustering/Obj1_Dashboard/20230220_selected_df.csv',
+LOGO_PATH = "lLogoIcon2-01.png"
+logo = Image.open(LOGO_PATH)
+df = pd.read_csv('20230220_selected_df.csv',
                  index_col=0)
+
+
 
 
 #Define some data querying and aggregation
@@ -83,7 +86,7 @@ pie_fig.update_layout(legend=dict(
     xanchor="center",
     x= -0.1) ,
                       autosize=True,
-                      width=500,
+                      width=300,
                       height=450)
 
 
@@ -94,8 +97,8 @@ class_1_fig = px.pie(data_frame= group_df[group_df['clean_BE'] == 1],
        category_orders = {"sentiment": ['positive' ,'negative' 'neutral']},
        hole= 0.5)
 class_1_fig.update_layout(showlegend=False,
-                          width=350,
-                          height=350)
+                          width=300,
+                          height=450)
 
 class_2_fig = px.pie(data_frame= group_df[group_df['clean_PD'] == 1],
        names = group_df[group_df['clean_PD'] == 1].sentiment,
@@ -105,7 +108,7 @@ class_2_fig = px.pie(data_frame= group_df[group_df['clean_PD'] == 1],
        hole= 0.5)
 class_2_fig.update_layout(showlegend=False,
                           width=350,
-                          height=350)
+                          height=450)
 
 class_3_fig = px.pie(data_frame= group_df[group_df['clean_DM'] == 1],
        names = group_df[group_df['clean_DM'] == 1].sentiment,
@@ -115,7 +118,7 @@ class_3_fig = px.pie(data_frame= group_df[group_df['clean_DM'] == 1],
        hole= 0.5)
 class_3_fig.update_layout(showlegend=False,
                           width=350,
-                          height=350)
+                          height=450)
 
 class_4_fig = px.pie(data_frame= group_df[group_df['clean_AS'] == 1],
        names = group_df[group_df['clean_AS'] == 1].sentiment,
@@ -125,7 +128,7 @@ class_4_fig = px.pie(data_frame= group_df[group_df['clean_AS'] == 1],
        hole= 0.5)
 class_4_fig.update_layout(showlegend=False,
                           width=350,
-                          height=350,
+                          height=450,
                           legend=dict(
                                 orientation="h",
                                 yanchor="middle",
@@ -184,6 +187,15 @@ As for the positive proportion, the leading topic goes to `Product`, accounting 
 
 st.text_area(label = 'Analysis',
              value = text )
+
+
+
+
+last_row_col1, last_row_col2 = st.columns([25,1])
+
+with last_row_col2:
+    st.image(logo, width = 50)
+
 # col1, col2 ,col3= st.columns((1.5, 1, 1))
 
 
