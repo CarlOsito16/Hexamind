@@ -15,3 +15,8 @@ Given the customer reviews from public website such as Trustadvisor, this demo a
 The defaut `top_n` hyperparameter for `NOUN` token is 3. This should suggest the top most relevant words that could be later used for clustering when having larger dataset of reviews.
 
 As for the `PROPN` or `proper noun` tokens, not every review has this word, thus the model can also return blank. The purpose of this proper noun extraction is to give a more fine-grained insights into plausibly product brands, branch names, city etc.
+
+---
+# File Description
+- Hexamind_resume.ipynb: the first and original file developed on colab, it contains all the workflow from end to end
+- GenerateSummary.ipynb: this file is to only call the functions developed prior to generate summary and keywords based on the manually dataset at 20230220 
