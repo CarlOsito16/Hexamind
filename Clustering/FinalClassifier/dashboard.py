@@ -11,6 +11,7 @@ import os
 from pandas.tseries.offsets import DateOffset
 WORKING_PATH = ""
 
+print(os.getcwd())
 
 st.set_page_config(
     page_title = 'Streamlit Sample Dashboard Template',
@@ -30,8 +31,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+print(os.getcwd())
+
 with open("UI-element/style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 LOGO_PATH = "UI-element/lLogoIcon2-01.png"
 logo = Image.open(LOGO_PATH)
 
@@ -76,6 +80,8 @@ color_map = {'⭐⭐⭐⭐⭐' : "dodgerblue",
 
 df = pd.read_csv('data/final_carrefour_df_with_label.csv',
                  index_col=0)
+all_comp_df = pd.read_csv('data/all_comp_df.csv',
+                          index_col=0)
 #Define some data querying and aggregation
 clean_superclass = ['clean_BE', 'clean_PD', 'clean_DM', 'clean_AS']
 group_df  = df.loc[: , ['ratings', 'dates'] + clean_superclass ] #  we need to have 'dates' for further timedifference
@@ -197,7 +203,7 @@ st.write("""
          # Distribution of sentiments toward 4 major topics from reviews on **Carrefour**
          """)
 st.write(f"##### We have gather the total ouf {len(df):,} reviews from Trustpilot webiste. The purpose is to see the how customers perceive through major 4 topics within customer journeys.")
-print(os.getcwd())
+# print(os.getcwd())
 st.markdown(os.getcwd())
 
 
