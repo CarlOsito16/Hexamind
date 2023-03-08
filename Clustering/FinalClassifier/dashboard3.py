@@ -53,6 +53,8 @@ st.set_page_config(
 # [data-testid="stMetricValue"] {
 #     font-size: 50px;
 # }
+
+# [data-testid="stImage"] {}
 # </style>,
 
 # """,
@@ -66,9 +68,7 @@ st.markdown(
     font-size: 50px;
 }
 
-body {
-  background: #ff0099; 
-  }
+
 
 </style>
 
@@ -92,9 +92,14 @@ with open("UI-element/style.css") as f:
 LOGO_PATH = "UI-element/lLogoIcon2-01.png"
 logo = Image.open(LOGO_PATH)
 
-WHITE_LOGO_PATH = "UI-element/lLogoIcon1_White-01.png"
+WHITE_LOGO_PATH = "UI-element/OriginalLogoIconWhite-01.png"
 white_logo = Image.open(WHITE_LOGO_PATH)
 
+
+# def img_to_bytes(img_path):
+#     img_bytes = Path(img_path).read_bytes()
+#     encoded_img = base64.b64encode(img_bytes).decode()
+#     return encoded_img
 
 #FRENCH STOP WORDS
 
@@ -128,11 +133,34 @@ outer_df['dates'] = pd.to_datetime(outer_df['dates'])
 with st.sidebar:
     a, b, c  = st.columns([1,2, 0.2])
     with a:
-        st.image(white_logo, width = 75)
+        # link = 'http://www.hexamind.ai/'
+        # image_base64 = "https://img2.freepng.fr/20181227/jy/kisspng-agumon-tai-kamiya-portable-network-graphics-drawin-agumon-png-6-ampquot-png-image-5c2504863e8812.0474668915459298622561.jpg"
+        # html = f"<a href='{link}'><img src='data:image/png;base64,{image_base64}'></a>" 
+        # st.markdown(html, unsafe_allow_html=True)
+        
+        
+        html = """
+        <a href='http://www.hexamind.ai/'> 
+        <img src='https://uploads-ssl.webflow.com/63f612a19c5c59312c05d479/63f61d38d0d2e50f9c9d49f7_OriginalLogoIconWhite-01-p-500.png'
+        width="75"> 
+        </a> 
+        """
+        st.markdown(html, unsafe_allow_html=True)
+        # st.image(white_logo, width=75)
+        
+        
+        
+        
+        # st.markdown("""
+        # <a href='http://www.hexamind.ai/'>
+        # <img src = WHITE_LOGO_PATH>
+        # </a>
+        # """)
+        
+        # st.markdown("[![Foo](LOGO_PATH)](http://google.com.au/)")
+        
     with b:
         st.write('# HEXAMIND.AI')
-        
-        
     st.write("## Dopez votre relation client à l’IA:") 
     st.write("""développez l’autonomie de vos clients,
 outillez vos agents pour gagner en efficacité et en proximité avec vos clients
