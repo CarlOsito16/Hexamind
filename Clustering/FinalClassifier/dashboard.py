@@ -26,6 +26,8 @@ st.markdown(
 [data-testid="stMetricValue"] {
     font-size: 50px;
 }
+
+
 </style>
 """,
     unsafe_allow_html=True,

@@ -10,7 +10,7 @@ import os
 
 import plotly.graph_objs as go
 from pandas.tseries.offsets import DateOffset
-from helper_function import chart_df
+# from helper_function import chart_df
 WORKING_PATH = ""
 
 
@@ -47,22 +47,53 @@ st.set_page_config(
 )
 
 
+# st.markdown(
+#     """
+# <style>
+# [data-testid="stMetricValue"] {
+#     font-size: 50px;
+# }
+# </style>,
+
+# """,
+#     unsafe_allow_html=True,
+# )
+
 st.markdown(
     """
 <style>
 [data-testid="stMetricValue"] {
     font-size: 50px;
 }
+
+body {
+  background: #ff0099; 
+  }
+
 </style>
+
 """,
     unsafe_allow_html=True,
 )
+
+
+
+
+
+
+
+
+
+
 
 with open("UI-element/style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     
 LOGO_PATH = "UI-element/lLogoIcon2-01.png"
 logo = Image.open(LOGO_PATH)
+
+WHITE_LOGO_PATH = "UI-element/lLogoIcon1_White-01.png"
+white_logo = Image.open(WHITE_LOGO_PATH)
 
 
 #FRENCH STOP WORDS
@@ -95,16 +126,28 @@ outer_df['dates'] = pd.to_datetime(outer_df['dates'])
 
 #FILTER
 with st.sidebar:
-    st.title("Comparison benchmark timeframe")
-    time_cutoff = st.slider(
-        'Select a benchmark timeframe',
-        1, 24, 3)
-    st.write('Compared to the', time_cutoff, ' months ago')
+    a, b, c  = st.columns([1,2, 0.2])
+    with a:
+        st.image(white_logo, width = 75)
+    with b:
+        st.write('# HEXAMIND.AI')
+        
+        
+    st.write("## Dopez votre relation client à l’IA:") 
+    st.write("""développez l’autonomie de vos clients,
+outillez vos agents pour gagner en efficacité et en proximité avec vos clients
+analysez a posteriori vos interactions pour mieux comprendre vos atouts et axes d’amélioration.
+""")
+    # st.title("Comparison benchmark timeframe")
+    # time_cutoff = st.slider(
+    #     'Select a benchmark timeframe',
+    #     1, 24, 3)
+    # st.write('Compared to the', time_cutoff, ' months ago')
     
     st.markdown("---")
 
     selected_competitors = st.multiselect(
-    "Choose companies for benchmarking",
+    "Veuillez choisir des entreprises pour l'analyse comparative",
     options= outer_df['company_name'].unique(),
     default= outer_df['company_name'].unique())
 
@@ -112,7 +155,7 @@ outer_df = outer_df[outer_df['company_name'].isin(selected_competitors)]
 
 
 today = pd.Timestamp.today()
-cut_off_3m_date = today - DateOffset(months=time_cutoff)
+cut_off_3m_date = today - DateOffset(months=3)
 
 # Now filter every row of the dataframe tha is before the `cut_off_3m_date`
 last_benchmark_df  = inner_df[inner_df['dates'] < cut_off_3m_date.tz_localize('utc')]
@@ -142,8 +185,11 @@ as_delta = round(as_now_score - as_benchmark_score, 2)
 
 
 #CHART
-color_palette = ['tomato', 'lightsalmon', 'gold', 'skyblue', 'dodgerblue']
+# color_palette = ['tomato', 'lightsalmon', 'gold', 'skyblue', 'dodgerblue']
+color_palette = ['lightskyblue', 'deepskyblue', 'dodgerblue', 'royablue', 'midnightblue']
 
+
+# midnightblue
 all_class = [go.Pie(values=get_distribution_list(inner_df, None),
        labels = ['⭐', '⭐⭐','⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'],
        hole=0.2,
@@ -253,64 +299,60 @@ AS_class_fig = go.Figure(data=AS_class).update_traces(marker=dict(colors=color_p
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # st.write(inner_df.shape, outer_df.shape)
-
+st.write("""
+         #### Hexamind intervient en conseil pour l’identification des opportunités, en produisant des maquettes sur des cycles courts et en développant des solutions adaptées à votre contexte. 
+         """)
 
 st.write("""
-        # Distribution of ratings toward 4 major topics from reviews on **Carrefour**
-        """)
-st.write(f"##### We have gather the total ouf {len(inner_df):,} reviews from Trustpilot webiste. The purpose is to see the how customers their shopping experience through major 4 topics within customer journeys.")
+         Cette démonstration vise à illustrer une capacité d’analyse du traitement du langage en répartissant les revues des clients selon la phase de l’expérience client - achat, livraison, utilisation du produit ou du service, après-vente - rendant une information très diffuse (plusieurs milliers de revues) en des informations actionnables. La capacité d’automatisation permet d’étendre simplement l’analyse à un secteur et de se positionner ainsi relativement à la concurrence. 
+         """)
+
+st.write("Les technologies employées ici s’appuient sur les Transformers (du type chat GPT) en Open Source sur Hugging Face avec des modèles pré entraînés sur un corpus en français et les revues de Trustpilot.")
+
+# st.write("""
+#         # Distribution of ratings toward 4 major topics from reviews on **Carrefour**
+#         """)
+# st.write(f"##### We have gather the total ouf {len(inner_df):,} reviews from Trustpilot webiste. The purpose is to see the how customers perceive their shopping experience through major 4 topics within customer journeys.")
 
 # print(os.getcwd())
 # st.markdown(os.getcwd())
 
-row1_col1, row1_col2 = st.columns([1.3,4])
+# row1_col1, row1_col2 = st.columns([1.3,4])
 
 
-with row1_col1:
-    st.subheader("All reviews ratings")
+# with row1_col1:
+#     st.subheader("All reviews ratings")
 
-with row1_col2:
-    st.subheader("Now let's loook at the distribution broken down into 4 superclasses")
+# with row1_col2:
+#     st.subheader("Now let's loook at the distribution broken down into 4 superclasses")
     
     
 row2_col1, row2_col2, row2_col3, row2_col4, row2_col5 = st.columns([1.3, 1 ,1 ,1 ,1])
 
 with row2_col1:
-    st.metric(label = 'Overall Ratings', value = all_now_score, delta = f"{all_delta} from {time_cutoff} months ago")
+    st.metric(label = 'Notes globales', value = all_now_score, delta = f"{all_delta} des 3 derniers mois")
     st.plotly_chart(all_class_fig, use_container_width=True)
 with row2_col2:
-    st.metric(label = '🛒 Buying Experience', value = be_now_score, delta = f"{be_delta} from {time_cutoff} months ago")
+    st.metric(label = "🛒 Expérience d'achat", value = be_now_score, delta = f"{be_delta} des 3 derniers mois")
     st.plotly_chart(BE_class_fig, use_container_width=True)
-with row2_col3:
-    st.metric(label = '🥦 Product', value = pd_now_score, delta = f"{pd_delta} from {time_cutoff} months ago")
-    st.plotly_chart(PD_class_fig, use_container_width=True)
 with row2_col4:
-    st.metric(label = '🚚 Delivery', value = dm_now_score, delta = f"{dm_delta} from {time_cutoff} months ago")
+    st.metric(label = '🥦 Produit', value = pd_now_score, delta = f"{pd_delta} des 3 derniers mois")
+    st.plotly_chart(PD_class_fig, use_container_width=True)
+with row2_col3:
+    st.metric(label = '🚚 Livraison', value = dm_now_score, delta = f"{dm_delta} des 3 derniers mois")
     st.plotly_chart(DM_class_fig, use_container_width=True)
 with row2_col5:
-    st.metric(label = '📞 After Sales', value = as_now_score, delta = f"{as_delta} from {time_cutoff} months ago")
+    st.metric(label = '📞 Après-vente ', value = as_now_score, delta = f"{as_delta} des 3 derniers mois")
     st.plotly_chart(AS_class_fig, use_container_width=True)
 
 
+st.write("** Les graphiques ci-dessus contiennent 2 anneaux, **l'anneau intérieur** représentant Carrefour et **l'anneau extérieur** les concurrents sélectionnés")
 
 
 
-with st.expander("See most frequent words in each category"):
+
+with st.expander("Voir les mots les plus fréquents dans chaque catégorie"):
     expander_col1, expander_col2 = st.columns([2,2])
     with expander_col1:
         BE_text = inner_df[inner_df['clean_BE']==1].combined_reviews.to_string(header=False, index=False)
@@ -341,12 +383,12 @@ with st.expander("See most frequent words in each category"):
         
         fig, axes = plt.subplots(2, 1, figsize = (3,5) )
         axes[0].imshow(BE_wc, interpolation='bilinear')
-        axes[0].set_title('Word cloud for Buying Experience')
+        axes[0].set_title("Nuage de mots pour l'expérience d'achat")
         axes[0].axis('off')
         
         
         axes[1].imshow(DM_wc, interpolation='bilinear')
-        axes[1].set_title('Word cloud for Delivery Mode')
+        axes[1].set_title("Nuage de mots pour livraison")
         axes[1].axis('off')
         st.pyplot(fig)
     
@@ -379,18 +421,18 @@ with st.expander("See most frequent words in each category"):
         
         fig_, axes_ = plt.subplots(2, 1, figsize = (3,5) )
         axes_[0].imshow(PD_wc, interpolation='bilinear')
-        axes_[0].set_title('Word cloud for Product')
+        axes_[0].set_title("Nuage de mots pour produit")
         axes_[0].axis('off')
         
         
         axes_[1].imshow(AS_wc, interpolation='bilinear')
-        axes_[1].set_title('Word cloud for After Sales')
+        axes_[1].set_title("Nuage de mots pour après-vente ")
         axes_[1].axis('off')
         st.pyplot(fig_)
 
-last_row_col1, last_row_col2 = st.columns([22,1])
+# last_row_col1, last_row_col2 = st.columns([22,1])
 
-with last_row_col2:
-    st.image(logo, width = 50)
+# with last_row_col2:
+#     st.image(logo, width = 50)
         
 
