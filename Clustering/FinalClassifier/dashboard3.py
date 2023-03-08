@@ -21,7 +21,11 @@ def compute_score(df, columns=None):
         score = df['ratings'].mean()
     else:
         score = df[df[columns] == 1].ratings.mean()
-    return round(score, 2)
+    return round(score, 1)
+
+def dot_to_comma(number):
+    comma_num = str(number).replace('.', ',')
+    return comma_num
 
 
 def get_distribution_list(df, column = None):
@@ -61,25 +65,31 @@ st.set_page_config(
 #     unsafe_allow_html=True,
 # )
 
-st.markdown(
-    """
+some_css = """
+
 <style>
 [data-testid="stMetricValue"] {
     font-size: 50px;
 }
 
+.small-font {
+    font-size:10px ;
+    color: white;
+}
 
+.side-bar-font {
+    color:white;
+}
+
+[data-testid="stAppViewContainer"] {
+    color: 'white';
+}
 
 </style>
-
-""",
-    unsafe_allow_html=True,
-)
+"""
 
 
-
-
-
+st.markdown(some_css, unsafe_allow_html=True)
 
 
 
@@ -160,12 +170,36 @@ with st.sidebar:
         # st.markdown("[![Foo](LOGO_PATH)](http://google.com.au/)")
         
     with b:
-        st.write('# HEXAMIND.AI')
-    st.write("## Dopez votre relation client à l’IA:") 
-    st.write("""développez l’autonomie de vos clients,
-outillez vos agents pour gagner en efficacité et en proximité avec vos clients
-analysez a posteriori vos interactions pour mieux comprendre vos atouts et axes d’amélioration.
-""")
+        st.write("<h1 class='side-bar-font'>HEXAMIND</p>",
+             unsafe_allow_html=True)
+        
+    st.write(""" """)
+    st.write("<p class='side-bar-font'>Veuillez choisir des entreprises pour l'analyse comparative</p>",
+             unsafe_allow_html=True)
+    selected_competitors = st.multiselect(
+        label="",
+    options= outer_df['company_name'].unique(),
+    default= outer_df['company_name'].unique())
+    
+    
+    
+    st.markdown("   ---")
+    
+    
+    about_hexamind_1 = """
+    Hexamind une société formée autour de passionnés d’IA, docteurs pour certains, passés par des universités américaines (Yale, Stanford) et par de grandes ESN généralistes (Cap, SopraSteria, Accenture) ou plus focalisées (Niji). Nous nous sommes spécialisés sur les algorithmes de traitement du langage  appliqués à la relation client : analyse des mails, chatbot, speech-to-text, etc.
+    """
+    
+    about_hexamind_2 = """Hexamind intervient en conseil pour l’identification des opportunités, en produisant des maquettes sur des cycles courts et en développant des solutions adaptées à votre contexte. L'objectif est de ne mobiliser que très peu vos équipes techniques (pour extraire les données) et de permettre de se focaliser sur la valeur métier tout en se projetant sur de vraies solutions techniques
+    """
+    
+    st.write("<h3 class='side-bar-font'>HEXAMIND</p>",
+             unsafe_allow_html=True)
+    st.write(f"<p class='small-font'>{about_hexamind_1}</p>",
+             unsafe_allow_html=True)
+    
+    st.write(f"<p class='small-font'>{about_hexamind_2}</p>",
+             unsafe_allow_html=True)
     # st.title("Comparison benchmark timeframe")
     # time_cutoff = st.slider(
     #     'Select a benchmark timeframe',
@@ -174,10 +208,6 @@ analysez a posteriori vos interactions pour mieux comprendre vos atouts et axes 
     
     st.markdown("---")
 
-    selected_competitors = st.multiselect(
-    "Veuillez choisir des entreprises pour l'analyse comparative",
-    options= outer_df['company_name'].unique(),
-    default= outer_df['company_name'].unique())
 
 outer_df = outer_df[outer_df['company_name'].isin(selected_competitors)]
 
@@ -209,7 +239,7 @@ all_delta = round(all_now_score - all_benchmark_score, 2)
 be_delta = round(be_now_score - be_benchmark_score , 2)
 pd_delta = round(pd_now_score - pd_benchmark_score, 2)
 dm_delta = round(dm_now_score - dm_benchmark_score, 2)
-as_delta = round(as_now_score - as_benchmark_score, 2)
+as_delta = round(as_now_score - as_benchmark_score, 2  )
 
 
 #CHART
@@ -329,14 +359,14 @@ AS_class_fig = go.Figure(data=AS_class).update_traces(marker=dict(colors=color_p
 
 # st.write(inner_df.shape, outer_df.shape)
 st.write("""
-         #### Hexamind intervient en conseil pour l’identification des opportunités, en produisant des maquettes sur des cycles courts et en développant des solutions adaptées à votre contexte. 
+         ### Tableau de bord du parcours client de Carrefour issu des revues Trustpilot
          """)
 
 st.write("""
-         Cette démonstration vise à illustrer une capacité d’analyse du traitement du langage en répartissant les revues des clients selon la phase de l’expérience client - achat, livraison, utilisation du produit ou du service, après-vente - rendant une information très diffuse (plusieurs milliers de revues) en des informations actionnables. La capacité d’automatisation permet d’étendre simplement l’analyse à un secteur et de se positionner ainsi relativement à la concurrence. 
+         Trustpilot permet aux utilisateurs de poster des revues sur leurs fournisseurs et de donner une note de satisfaction **de 1 à 5**. Le nombre de revues est souvent supérieur à plusieurs milliers. Il est donc long et fastidieux, en dehors d’une moyenne globalisée, d’obtenir une vision agrégée qui permette de tirer des enseignements pour les fournisseurs. 
          """)
 
-st.write("Les technologies employées ici s’appuient sur les Transformers (du type chat GPT) en Open Source sur Hugging Face avec des modèles pré entraînés sur un corpus en français et les revues de Trustpilot.")
+st.write("Ce tableau de bord est issu d’une analyse par IA des revues et permet de les ventiler en fonction de la phase de l’expérience client : achat, livraison, utilisation du produit ou du service, après-vente. L’analyse est effectuée sur plusieurs enseignes d’un même secteur afin de permettre une comparaison avec la concurrence. ")
 
 # st.write("""
 #         # Distribution of ratings toward 4 major topics from reviews on **Carrefour**
@@ -359,24 +389,31 @@ st.write("Les technologies employées ici s’appuient sur les Transformers (du 
 row2_col1, row2_col2, row2_col3, row2_col4, row2_col5 = st.columns([1.3, 1 ,1 ,1 ,1])
 
 with row2_col1:
-    st.metric(label = 'Notes globales', value = all_now_score, delta = f"{all_delta} des 3 derniers mois")
+    st.metric(label = 'Notes globales', value = dot_to_comma(all_now_score), delta = f"{dot_to_comma(all_delta)} des 3 derniers mois")
     st.plotly_chart(all_class_fig, use_container_width=True)
 with row2_col2:
-    st.metric(label = "🛒 Expérience d'achat", value = be_now_score, delta = f"{be_delta} des 3 derniers mois")
+    st.metric(label = "🛒 Expérience d'achat", value = dot_to_comma(be_now_score), delta = f"{dot_to_comma(be_delta)} des 3 derniers mois")
     st.plotly_chart(BE_class_fig, use_container_width=True)
 with row2_col4:
-    st.metric(label = '🥦 Produit', value = pd_now_score, delta = f"{pd_delta} des 3 derniers mois")
+    st.metric(label = '🥦 Produit', value = dot_to_comma(pd_now_score), delta = f"{dot_to_comma(pd_delta)} des 3 derniers mois")
     st.plotly_chart(PD_class_fig, use_container_width=True)
 with row2_col3:
-    st.metric(label = '🚚 Livraison', value = dm_now_score, delta = f"{dm_delta} des 3 derniers mois")
+    st.metric(label = '🚚 Livraison', value = dot_to_comma(dm_now_score), delta = f"{dot_to_comma(dm_delta)} des 3 derniers mois")
     st.plotly_chart(DM_class_fig, use_container_width=True)
 with row2_col5:
-    st.metric(label = '📞 Après-vente ', value = as_now_score, delta = f"{as_delta} des 3 derniers mois")
+    st.metric(label = '📞 Après-vente ', value = dot_to_comma(as_now_score), delta = f"{dot_to_comma(as_delta)} des 3 derniers mois")
     st.plotly_chart(AS_class_fig, use_container_width=True)
 
 
-st.write("** Les graphiques ci-dessus contiennent 2 anneaux, **l'anneau intérieur** représentant Carrefour et **l'anneau extérieur** les concurrents sélectionnés")
 
+st.write("""
+         ##### Hexamind : l’IA pour la relation client
+         """)
+st.write("Les graphiques ci-dessus contiennent 2 anneaux, **l'anneau intérieur** représentant Carrefour et **l'anneau extérieur** les concurrents sélectionnés")
+
+st.write("""
+         Cette démonstration vise à illustrer une capacité d’analyse du traitement du langage.  Elle est réalisée par Hexamind qui s’appuient sur des technologies opensource de type chat GPT disponibles sur Hugging Face. Les modèles utilisés ont été entraînés par Hexamind sur un corpus en français et les revues de Trustpilot.
+         """)
 
 
 
