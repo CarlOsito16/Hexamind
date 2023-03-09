@@ -21,7 +21,7 @@ def compute_score(df, columns=None):
         score = df['ratings'].mean()
     else:
         score = df[df[columns] == 1].ratings.mean()
-    return round(score, 1)
+    return round(score, 2)
 
 def dot_to_comma(number):
     comma_num = str(number).replace('.', ',')
@@ -83,7 +83,12 @@ some_css = """
 
 [data-testid="stAppViewContainer"] {
     color: 'white';
+    
+    
 }
+
+[data-testid="stHorizontalBlock"] {
+    height:100;
 
 </style>
 """
@@ -170,7 +175,7 @@ with st.sidebar:
         # st.markdown("[![Foo](LOGO_PATH)](http://google.com.au/)")
         
     with b:
-        st.write("<h1 class='side-bar-font'>HEXAMIND</p>",
+        st.write("<h1 class='side-bar-font'>Hexamind</p>",
              unsafe_allow_html=True)
         
     st.write(""" """)
@@ -193,7 +198,7 @@ with st.sidebar:
     about_hexamind_2 = """Hexamind intervient en conseil pour l’identification des opportunités, en produisant des maquettes sur des cycles courts et en développant des solutions adaptées à votre contexte. L'objectif est de ne mobiliser que très peu vos équipes techniques (pour extraire les données) et de permettre de se focaliser sur la valeur métier tout en se projetant sur de vraies solutions techniques
     """
     
-    st.write("<h3 class='side-bar-font'>HEXAMIND</p>",
+    st.write("<h4 class='side-bar-font'>Hexamind: l’IA pour la relation client</p>",
              unsafe_allow_html=True)
     st.write(f"<p class='small-font'>{about_hexamind_1}</p>",
              unsafe_allow_html=True)
@@ -406,11 +411,14 @@ with row2_col5:
 
 
 
-st.write("""
-         ##### Hexamind : l’IA pour la relation client
-         """)
+# st.write("""
+#          ##### Hexamind : l’IA pour la relation client
+#          """)
 st.write("Les graphiques ci-dessus contiennent 2 anneaux, **l'anneau intérieur** représentant Carrefour et **l'anneau extérieur** les concurrents sélectionnés")
+st.write("")
 
+
+st.write("##### Méthodologie")
 st.write("""
          Cette démonstration vise à illustrer une capacité d’analyse du traitement du langage.  Elle est réalisée par Hexamind qui s’appuient sur des technologies opensource de type chat GPT disponibles sur Hugging Face. Les modèles utilisés ont été entraînés par Hexamind sur un corpus en français et les revues de Trustpilot.
          """)
