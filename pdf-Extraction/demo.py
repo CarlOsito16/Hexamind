@@ -8,8 +8,8 @@ import pandas as pd
 st.set_page_config(page_title="PDF Text Extractor", page_icon=":books:")
 
 
-pdf = pdfquery.PDFQuery('attestation.pdf')
-pdf.load()
+# pdf = pdfquery.PDFQuery('attestation.pdf')
+# pdf.load()
 
 def clean_text_data(text):
     return text.split(': ')[1]
@@ -20,8 +20,8 @@ def clean_year(text):
     return output
 
 
-def use_pdfquery(pdf):
-    pdf = pdfquery.PDFQuery('attestation.pdf')
+def use_pdfquery(pdf_file):
+    pdf = pdfquery.PDFQuery(pdf_file)
     pdf.load()
     lastname = pdf.pq('LTTextLineHorizontal:contains("Nom")').text()
     name = pdf.pq('LTTextLineHorizontal:contains("Prénom")').text()
