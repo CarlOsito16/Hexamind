@@ -9,8 +9,7 @@ st.title('Demo of chatGPT')
 
     
 
-# api_key = os.environ.get('chagpt_API_KEY')
-openai.api_key = "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"
+
 
 if "history" not in st.session_state:
     st.session_state.history = []

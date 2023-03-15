@@ -14,7 +14,7 @@ st.set_page_config(
     
 
 # api_key = os.environ.get('chagpt_API_KEY')
-openai.api_key = "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"
+openai.api_key = #sth
 
 if "history_1" not in st.session_state:
     st.session_state.history_1 = []
@@ -90,4 +90,4 @@ with botscreen2:
         st_message(**chat)  # unpacking
         
 
-    st.write(st.session_state.history_2)
+    st.write(st.session_state.history_)
