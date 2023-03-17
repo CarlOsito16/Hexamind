@@ -7,7 +7,8 @@ from streamlit_chat import message as st_message
 
 st.title('Demo of chatGPT')
 
-    
+# api_key = os.environ.get('chagpt_API_KEY')
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
 
 

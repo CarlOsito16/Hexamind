@@ -14,7 +14,7 @@ st.set_page_config(
     
 
 # api_key = os.environ.get('chagpt_API_KEY')
-openai.api_key = #sth
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
 if "history_1" not in st.session_state:
     st.session_state.history_1 = []
