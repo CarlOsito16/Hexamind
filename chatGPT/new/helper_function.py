@@ -4,13 +4,7 @@ import numpy as np
 # from app import input_value
 
 
-if "history" not in st.session_state:
-    st.session_state.history = []
-    st.session_state.history.append({"message": "how can I help you today?", "is_user": False} )
-    st.session_state.history.append({"message": "Tell me more about you", "is_user": True} )
 
-if 'input_value' not in st.session_state:
-    st.session_state.input_value = ""
 
 # # agent_message  = st.text_input(bot_message)
 pre_questions = ['who are you?',

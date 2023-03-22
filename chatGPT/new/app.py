@@ -2,6 +2,14 @@ import streamlit as st
 from streamlit_chat import message as st_message
 from helper_function import *
 
+if "history" not in st.session_state:
+    st.session_state.history = []
+    st.session_state.history.append({"message": "how can I help you today?", "is_user": False} )
+    st.session_state.history.append({"message": "Tell me more about you", "is_user": True} )
+
+if 'input_value' not in st.session_state:
+    st.session_state.input_value = ""
+
 row1_col1, row1_col2 = st.columns([2,1])
 row2_col1, row2_col2 = st.columns([2,1])
 
@@ -15,7 +23,6 @@ def send_message():
     global button1_text, button2_text, button3_text
     st.session_state.history.append({"message": input_value  , "is_user": False})
     st.session_state.history.append({"message": f"{np.random.choice(pre_questions)} + {np.random.randint(low= 0,high =100, size=1)}"   , "is_user": True})
-
 
 
 with row1_col1:
