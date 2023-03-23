@@ -12,6 +12,7 @@ pre_answers = ["I don't know",
                  "I like NLP"]
 
 
+
 st.write("## 💬 Conversation 1")
 if "history_1" not in st.session_state:
     st.session_state.history_1 = []
@@ -60,10 +61,10 @@ if button3_clicked:
     update_input_value(button3_text)
 
 
-with row1_col1:
-    st.write("#### Conversation Screen:")
-    for chat in st.session_state.history_1:
-        st_message(**chat)
+# with row1_col1:
+#     st.write("#### Conversation Screen:")
+#     for chat in st.session_state.history_1:
+#         st_message(**chat)
 
 
 
@@ -75,6 +76,13 @@ with row2_col1:
                                 st.session_state.input_value)
     send_message_button = st.button("Send the message",
                                     on_click=send_message)
+    
+    
+
+with row1_col1:
+    st.write("#### Conversation Screen:")
+    for chat in st.session_state.history_1:
+        st_message(**chat)
     
   
 
